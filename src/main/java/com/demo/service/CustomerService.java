@@ -46,4 +46,12 @@ public interface CustomerService {
      * @return
      */
     Maybe<Void> deleteCustomerById(Long customerId);
+
+    /**
+     * Get customers by age.
+     *
+     * @param age
+     * @return
+     */
+    Maybe<List<Customer>> getCustomersByAge(int age);
 }

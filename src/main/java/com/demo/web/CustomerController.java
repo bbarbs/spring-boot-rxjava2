@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -110,5 +109,23 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     public Maybe<Customer> updateCustomerById(@PathVariable(name = "customerId") Long customerId, @RequestBody Customer customer) {
         return this.customerService.updateCustomerById(customerId, customer);
+    }
+
+    /**
+     * Get customers by age.
+     *
+     * @param age
+     * @return
+     */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Customer.class)
+    })
+    @GetMapping(
+            params = {"age"},
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(HttpStatus.OK)
+    public Maybe<List<Customer>> getCustomersByAge(@RequestParam(name = "age") int age) {
+        return this.customerService.getCustomersByAge(age);
     }
 }

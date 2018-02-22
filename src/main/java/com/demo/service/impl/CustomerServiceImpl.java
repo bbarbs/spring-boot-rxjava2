@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @Service
 @Transactional
@@ -75,6 +76,14 @@ public class CustomerServiceImpl implements CustomerService {
             }
             this.customerRepository.delete(customerId);
             return null;
+        });
+    }
+
+    @Override
+    public Maybe<List<Customer>> getCustomersByAge(int age) {
+        return Maybe.fromCallable(() -> {
+            List<Customer> customers = this.customerRepository.findAllByAge(age);
+            return customers;
         });
     }
 }
