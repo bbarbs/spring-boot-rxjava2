@@ -1,7 +1,7 @@
 package com.demo.service;
 
 import com.demo.model.Customer;
-import io.reactivex.Observable;
+import io.reactivex.Maybe;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface CustomerService {
      *
      * @return
      */
-    Observable<List<Customer>> findAllCustomer();
+    Maybe<List<Customer>> findAllCustomer();
 
     /**
      * Get customer by id.
@@ -20,7 +20,7 @@ public interface CustomerService {
      * @param customerId
      * @return
      */
-    Observable<Customer> getCustomerById(Long customerId);
+    Maybe<Customer> getCustomerById(Long customerId);
 
     /**
      * Add customer.
@@ -28,7 +28,7 @@ public interface CustomerService {
      * @param customer
      * @return
      */
-    Observable<Customer> addCustomer(Customer customer);
+    Maybe<Customer> addCustomer(Customer customer);
 
     /**
      * Update customer by id.
@@ -37,7 +37,7 @@ public interface CustomerService {
      * @param customer
      * @return
      */
-    Observable<Customer> updateCustomerById(Long customerId, Customer customer);
+    Maybe<Customer> updateCustomerById(Long customerId, Customer customer);
 
     /**
      * Delete customer by id.
@@ -45,5 +45,5 @@ public interface CustomerService {
      * @param customerId
      * @return
      */
-    Observable<Integer> deleteCustomerById(Long customerId);
+    Maybe<Void> deleteCustomerById(Long customerId);
 }

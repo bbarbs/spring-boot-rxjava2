@@ -2,22 +2,22 @@ package com.demo.web;
 
 import com.demo.model.Customer;
 import com.demo.service.CustomerService;
-import io.reactivex.Observable;
+import io.reactivex.Maybe;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RestController
 @RequestMapping(value = "/customers")
-public class CustomerController extends ExceptionHandler {
+public class CustomerController {
 
     @Autowired
     CustomerService customerService;
@@ -27,14 +27,15 @@ public class CustomerController extends ExceptionHandler {
      *
      * @return
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Customer.class)
+    })
     @GetMapping(
             produces = APPLICATION_JSON_VALUE
     )
-    public List<Customer> getAllCustomer() {
-        List<Customer> customers = new ArrayList<>();
-        Observable<List<Customer>> list = this.customerService.findAllCustomer();
-        list.subscribe(res -> customers.addAll(res)).dispose();
-        return customers;
+    @ResponseStatus(HttpStatus.OK)
+    public Maybe<List<Customer>> getAllCustomer() {
+        return this.customerService.findAllCustomer();
     }
 
     /**
@@ -43,20 +44,16 @@ public class CustomerController extends ExceptionHandler {
      * @param customer
      * @return
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Created", response = Customer.class)
+    })
     @PostMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    public Customer addCustomer(@RequestBody Customer customer) {
-        AtomicReference<Throwable> cause = new AtomicReference<>();
-        AtomicReference<Customer> c = new AtomicReference<>(new Customer());
-        Observable<Customer> result = this.customerService.addCustomer(customer);
-        result.subscribe(
-                res -> c.set(res),
-                throwable -> cause.set(throwable)
-        ).dispose();
-        this.handleException(cause.get());
-        return c.get();
+    @ResponseStatus(HttpStatus.CREATED)
+    public Maybe<Customer> addCustomer(@RequestBody Customer customer) {
+        return this.customerService.addCustomer(customer);
     }
 
     /**
@@ -65,20 +62,16 @@ public class CustomerController extends ExceptionHandler {
      * @param customerId
      * @return
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Customer.class)
+    })
     @GetMapping(
             value = "/{customerId}",
             produces = APPLICATION_JSON_VALUE
     )
-    public Customer getCustomerById(@PathVariable(name = "customerId") Long customerId) {
-        AtomicReference<Throwable> cause = new AtomicReference<>();
-        AtomicReference<Customer> c = new AtomicReference<>(new Customer());
-        Observable<Customer> result = this.customerService.getCustomerById(customerId);
-        result.subscribe(
-                customer -> c.set(customer),
-                throwable -> cause.set(throwable)
-        ).dispose();
-        this.handleException(cause.get());
-        return c.get();
+    @ResponseStatus(HttpStatus.OK)
+    public Maybe<Customer> getCustomerById(@PathVariable(name = "customerId") Long customerId) {
+        return this.customerService.getCustomerById(customerId);
     }
 
     /**
@@ -87,20 +80,16 @@ public class CustomerController extends ExceptionHandler {
      * @param customerId
      * @return
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "No Content")
+    })
     @DeleteMapping(
             value = "/{customerId}",
-            produces = TEXT_PLAIN_VALUE
+            produces = {APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE}
     )
-    public ResponseEntity<?> deleteCustomerById(@PathVariable(name = "customerId") Long customerId) {
-        AtomicReference<Throwable> cause = new AtomicReference<>();
-        Observable<Integer> result = this.customerService.deleteCustomerById(customerId);
-        result.subscribe(
-                integer -> {
-                },
-                throwable -> cause.set(throwable)
-        ).dispose();
-        this.handleException(cause.get());
-        return new ResponseEntity<>(HttpStatus.OK);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Maybe<Void> deleteCustomerById(@PathVariable(name = "customerId") Long customerId) {
+        return this.customerService.deleteCustomerById(customerId);
     }
 
     /**
@@ -110,20 +99,16 @@ public class CustomerController extends ExceptionHandler {
      * @param customer
      * @return
      */
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Created", response = Customer.class)
+    })
     @PutMapping(
             value = "/{customerId}",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    public Customer updateCustomerById(@PathVariable(name = "customerId") Long customerId, @RequestBody Customer customer) {
-        AtomicReference<Throwable> cause = new AtomicReference<>();
-        AtomicReference<Customer> c = new AtomicReference<>(new Customer());
-        Observable<Customer> result = this.customerService.updateCustomerById(customerId, customer);
-        result.subscribe(
-                cust -> c.set(cust),
-                throwable -> cause.set(throwable)
-        ).dispose();
-        this.handleException(cause.get());
-        return c.get();
+    @ResponseStatus(HttpStatus.CREATED)
+    public Maybe<Customer> updateCustomerById(@PathVariable(name = "customerId") Long customerId, @RequestBody Customer customer) {
+        return this.customerService.updateCustomerById(customerId, customer);
     }
 }

@@ -5,7 +5,7 @@ import com.demo.exception.EmailExistsException;
 import com.demo.model.Customer;
 import com.demo.repository.CustomerRepository;
 import com.demo.service.CustomerService;
-import io.reactivex.Observable;
+import io.reactivex.Maybe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +20,16 @@ public class CustomerServiceImpl implements CustomerService {
     CustomerRepository customerRepository;
 
     @Override
-    public Observable<List<Customer>> findAllCustomer() {
-        return Observable.fromCallable(() -> {
+    public Maybe<List<Customer>> findAllCustomer() {
+        return Maybe.fromCallable(() -> {
             List<Customer> customers = this.customerRepository.findAll();
             return customers;
         });
     }
 
     @Override
-    public Observable<Customer> getCustomerById(Long customerId) {
-        return Observable.fromCallable(() -> {
+    public Maybe<Customer> getCustomerById(Long customerId) {
+        return Maybe.fromCallable(() -> {
             Customer customer = customerRepository.findOne(customerId);
             if (customer == null) {
                 throw new CustomerNotFoundException("Customer not found");
@@ -39,21 +39,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Observable<Customer> addCustomer(Customer customer) {
-        return Observable.defer(() -> {
+    public Maybe<Customer> addCustomer(Customer customer) {
+        return Maybe.fromCallable(() -> {
             // Check if email exist.
             boolean isEmailExist = this.customerRepository.existsByEmail(customer.getEmail());
             if (isEmailExist) {
                 throw new EmailExistsException("Email already exist");
             }
             Customer c = this.customerRepository.save(customer);
-            return Observable.just(c);
+            return c;
         });
     }
 
     @Override
-    public Observable<Customer> updateCustomerById(Long customerId, Customer customer) {
-        return Observable.fromCallable(() -> {
+    public Maybe<Customer> updateCustomerById(Long customerId, Customer customer) {
+        return Maybe.fromCallable(() -> {
             Customer c = this.customerRepository.findOne(customerId);
             if (c == null) {
                 throw new CustomerNotFoundException("Customer not found");
@@ -68,14 +68,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Observable<Integer> deleteCustomerById(Long customerId) {
-        return Observable.defer(() -> {
-            Customer customer = this.customerRepository.findOne(customerId);
-            if (customer == null) {
-                return Observable.error(new CustomerNotFoundException("Customer not found"));
+    public Maybe<Void> deleteCustomerById(Long customerId) {
+        return Maybe.fromCallable(() -> {
+            if (!this.customerRepository.exists(customerId)) {
+                throw new CustomerNotFoundException("Customer not found");
             }
             this.customerRepository.delete(customerId);
-            return Observable.just(1);
+            return null;
         });
     }
 }
