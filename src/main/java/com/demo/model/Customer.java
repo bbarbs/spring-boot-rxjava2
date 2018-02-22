@@ -25,7 +25,8 @@ public class Customer {
 
     private int age;
 
-    public Customer() {}
+    public Customer() {
+    }
 
     public Customer(String email, String firstname, String lastname, int age) {
         this.email = email;

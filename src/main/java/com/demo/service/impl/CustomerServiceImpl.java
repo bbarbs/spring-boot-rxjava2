@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 @Service
 @Transactional
@@ -70,20 +69,22 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Maybe<Void> deleteCustomerById(Long customerId) {
-        return Maybe.fromCallable(() -> {
+        // Use .defer() for sample implementation.
+        return Maybe.defer(() -> {
             if (!this.customerRepository.exists(customerId)) {
                 throw new CustomerNotFoundException("Customer not found");
             }
             this.customerRepository.delete(customerId);
-            return null;
+            return Maybe.empty();
         });
     }
 
     @Override
     public Maybe<List<Customer>> getCustomersByAge(int age) {
-        return Maybe.fromCallable(() -> {
+        // Use .defer() for sample implementation.
+        return Maybe.defer(() -> {
             List<Customer> customers = this.customerRepository.findAllByAge(age);
-            return customers;
+            return Maybe.just(customers);
         });
     }
 }

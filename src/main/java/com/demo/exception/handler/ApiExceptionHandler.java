@@ -2,8 +2,8 @@ package com.demo.exception.handler;
 
 
 import com.demo.exception.ApiException;
-import com.demo.exception.EmailExistsException;
 import com.demo.exception.CustomerNotFoundException;
+import com.demo.exception.EmailExistsException;
 import com.demo.exception.message.ApiExceptionMessage;
 import com.demo.exception.message.ErrorMessage;
 import org.springframework.http.HttpStatus;
