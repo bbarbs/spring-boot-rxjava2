@@ -1,8 +1,8 @@
 ## Getting Started
 Sample spring boot project which implement [Rxjava2](https://github.com/ReactiveX/RxJava). It uses mainly the [Maybe](http://reactivex.io/RxJava/2.x/javadoc/io/reactivex/Maybe.html) operator for emitting data and to emit single data easily it use **.fromCallable()** method, while **.defer()** return the observer where you need to subcribe.
 
-## Implementation
-* .fromCallable(), exception here is thrown and catch by RestControllerAdvice.
+## Implementation and Exception Handling
+* **.fromCallable()**, exception here is thrown and catch by RestControllerAdvice and sent back to user.
 ```
 CustomerServiceImpl.class
 
@@ -25,14 +25,17 @@ public Maybe<Customer> getCustomerById(@PathVariable(name = "customerId") Long c
     }
 
 ```
-* .defer(), exception needs to be manage during subcribe in controller p.s. i didn't include it here.
+* **.defer()**, exception needs to be manage during subcribe in controller and then get the error and throw it so RestControllerAdvice will catch it and sent back to user.
 ```
 CustomerServiceImpl.class
 
-public Maybe<List<Customer>> getCustomersByAge(int age) {
+public Maybe<Void> deleteCustomerById(Long customerId) {
         return Maybe.defer(() -> {
-            List<Customer> customers = this.customerRepository.findAllByAge(age);
-            return Maybe.just(customers);
+            if (!this.customerRepository.exists(customerId)) {
+                throw new CustomerNotFoundException("Customer not found");
+            }
+            this.customerRepository.delete(customerId);
+            return Maybe.empty();
         });
     }
     
@@ -40,11 +43,16 @@ public Maybe<List<Customer>> getCustomersByAge(int age) {
 
 CustomerController.class
 
-public Maybe<List<Customer>> getCustomersByAge(@RequestParam(name = "age") int age) {
-        List<Customer> list = new ArrayList<>();
-        Maybe<List<Customer>> customers = this.customerService.getCustomersByAge(age);
-        customers.subscribe(result -> list.addAll(result));
-        return Maybe.just(list);
+public Maybe<Void> deleteCustomerById(@PathVariable(name = "customerId") Long customerId) {
+        AtomicReference<Throwable> cause = new AtomicReference<>();
+        Maybe<Void> result = this.customerService.deleteCustomerById(customerId);
+        result.subscribe(aVoid -> {}, throwable -> cause.set(throwable));
+        if(cause.get() != null) {
+            if (cause.get() instanceof CustomerNotFoundException) {
+                throw new CustomerNotFoundException(cause.get().getMessage());
+            }
+        }
+        return Maybe.empty();
     }
 ```
 
