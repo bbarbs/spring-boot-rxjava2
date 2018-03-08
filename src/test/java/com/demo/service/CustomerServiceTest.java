@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
@@ -62,5 +63,15 @@ public class CustomerServiceTest {
         observer.assertValueCount(1);
         observer.assertNoErrors();
         observer.assertValue(customer);
+    }
+
+    @Test
+    public void testShouldDeleteCustomerById() {
+        when(this.repository.exists(Mockito.anyLong())).thenReturn(true);
+        TestObserver<Void> observer = new TestObserver<>();
+        Maybe<Void> list = this.service.deleteCustomerById(1L);
+        list.subscribe(observer);
+        observer.assertComplete();
+        observer.assertNoErrors();
     }
 }
