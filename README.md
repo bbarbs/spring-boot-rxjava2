@@ -56,5 +56,7 @@ public Maybe<Void> deleteCustomerById(@PathVariable(name = "customerId") Long cu
     }
 ```
 
+Notes: If subscribe to observable is implemented in .fromCallable() then exception will not be catch by the spring controller advice. It needs to manually throw exception just like in .defer()
+
 ## Swagger
 * You can check the swagger ui here: http://localhost:8080/swagger-ui.html when running the project.
